@@ -1,5 +1,5 @@
 import { Inngest } from "inngest";
-import user from "../models/user";
+import user from "../models/user.js";
 
 export const inngest = new Inngest({ id: "quicktix" });
 
