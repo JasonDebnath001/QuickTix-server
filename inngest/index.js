@@ -73,11 +73,14 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
 
 // inngest function to send email when user booked a show
 const sendBookingConfirmationEmail = inngest.createFunction(
-  {id: "send=booking-confirmation-email"},
-  {event: 'app/show.booked'},
-  async ({event,step}) => {
-    const {bookingId} = event.data
-    const Booking = await booking.findById(bookingId).populate({path: 'show', populate: {path: 'movie', model: 'movie'}}).populate('user')
+  { id: "send-booking-confirmation-email" },
+  { event: "app/show.booked" },
+  async ({ event, step }) => {
+    const { bookingId } = event.data;
+    const Booking = await booking
+      .findById(bookingId)
+      .populate({ path: "show", populate: { path: "movie", model: "movie" } })
+      .populate("user");
     const emailBody = `
       <div style="font-family: Arial, sans-serif; line-height: 1.6;">
       <h2 style="color: #333;">Booking Confirmation</h2>
@@ -86,7 +89,9 @@ const sendBookingConfirmationEmail = inngest.createFunction(
       <p>Here are your booking details:</p>
       <ul>
         <li><strong>Movie:</strong> ${Booking.show.movie.title}</li>
-        <li><strong>Show Time:</strong> ${new Date(Booking.show.time).toLocaleString()}</li>
+        <li><strong>Show Time:</strong> ${new Date(
+          Booking.show.time
+        ).toLocaleString()}</li>
         <li><strong>Seats:</strong> ${Booking.bookedSeats.join(", ")}</li>
       </ul>
       <p>We hope you enjoy the show!</p>
@@ -100,6 +105,12 @@ const sendBookingConfirmationEmail = inngest.createFunction(
       body: emailBody,
     });
   }
-)
+);
 
-export const functions = [syncUserCreation, syncUserDeletion, syncUserUpdation, releaseSeatsAndDeleteBooking, sendBookingConfirmationEmail];
+export const functions = [
+  syncUserCreation,
+  syncUserDeletion,
+  syncUserUpdation,
+  releaseSeatsAndDeleteBooking,
+  sendBookingConfirmationEmail,
+];
