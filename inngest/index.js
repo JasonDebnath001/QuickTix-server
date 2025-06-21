@@ -1,5 +1,7 @@
 import { Inngest } from "inngest";
 import user from "../models/user.js";
+import booking from "../models/booking.js";
+import show from "../models/show.js";
 
 export const inngest = new Inngest({ id: "quicktix" });
 
@@ -44,4 +46,28 @@ const syncUserUpdation = inngest.createFunction(
   }
 );
 
-export const functions = [syncUserCreation, syncUserDeletion, syncUserUpdation];
+// Inngest function to cancel booking and release seats of show after 10 minutes of booking created if payment is not made
+const releaseSeatsAndDeleteBooking = inngest.createFunction(
+  { id: "release-seats-delete-booking" },
+  { event: "app/checkPayment" },
+  async ({ event, step }) => {
+    const tenMinutesLater = new Date(Date.now() + 10 * 60 * 1000);
+    await step.sleepUntil("wait-for-10-minutes", tenMinutesLater);
+    await step.run("check-payment-status", async () => {
+      const bookingId = event.data.bookingId;
+      const Booking = await booking.findById(bookingId);
+      // If payment is not made, release seats and delete booking
+      if (!Booking.isPaid) {
+        const Show = await show.findById(Booking.show);
+        Booking.bookedSeats.forEach((seat) => {
+          delete Show.occupiedSeats[seat];
+        });
+        Show.markModified("occupiedSeats");
+        await Show.save();
+        await booking.findByIdAndDelete(Booking._id);
+      }
+    });
+  }
+);
+
+export const functions = [syncUserCreation, syncUserDeletion, syncUserUpdation, releaseSeatsAndDeleteBooking];

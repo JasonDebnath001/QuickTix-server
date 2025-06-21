@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="../client/src/assets/logo.png" alt="QuickTix Logo" width="300" style="filter: invert(1)"/>
+  <img src="https://github.com/JasonDebnath001/QuickTix/raw/main/src/assets/logo.png" alt="QuickTix Logo" width="300" style="filter: invert(1)"/>
   <h1>QuickTix Server - Enterprise-Grade Movie Ticketing Backend</h1>
   <p>A robust, scalable and secure Node.js backend powering the QuickTix movie ticketing platform</p>
 </div>
